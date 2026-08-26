@@ -1,0 +1,12 @@
+[project]
+name = "BL4-AutoReload"
+version = "1.1.1"
+description = "Borderlands 4 native reload behavior mod with four selectable modes."
+authors = [
+    { name = "Sol (ChatGPT, GPT-5.6 Sol)" }
+]
+
+[tool.sdkmod]
+name = "BL4 AutoReload"
+version = "1.1.1"
+coop_support = "Unknown"
