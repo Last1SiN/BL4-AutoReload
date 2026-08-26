@@ -5,10 +5,16 @@ description = "Borderlands 4 native reload behavior mod with four selectable mod
 authors = [
     { name = "Sol (ChatGPT, GPT-5.6 Sol)" }
 ]
+maintainers = [
+    { name = "Last1SiN" }
+]
+
+[project.urls]
+Repository = "https://github.com/Last1SiN/BL4-AutoReload"
 
 [tool.sdkmod]
 name = "BL4 AutoReload"
 version = "1.1.1"
 license = { name = "GPL3", url = "https://choosealicense.com/licenses/gpl-3.0/" }
-download = "https://github.com/Last1SiN/BL4-AutoReload/releases/latest"
+download = "https://github.com/Last1SiN/BL4-AutoReload/releases/latest/download/BL4_AutoReload.sdkmod"
 coop_support = "ClientSide"
