@@ -2,8 +2,6 @@
 
 **Borderlands 4 PythonSDK / Oak2 mod**
 
-Four selectable native reload behaviors: automatic reload or fire-on-empty reload, for all supported weapons or Jakobs only.
-
 Current release: **v1.1.1**
 
 > Installation-ready `.sdkmod` files are published under **Releases**.  
@@ -70,6 +68,12 @@ The mod uses the game's native reload request:
 Normal reload animation, reload speed, perk effects, and standard interruption behavior are therefore preserved.
 
 In Empty Fire modes, Fire spam while a reload is already running does not restart the reload.
+
+
+## Compatibility and license
+
+- Co-op support: **ClientSide** — tested with the mod installed only on the local player while other co-op players did not have AutoReload installed.
+- License: **GPL-3.0**
 
 ## Credits
 
