@@ -9,7 +9,7 @@ Current release: **v1.1.1**
 
 ---
 
-A single Borderlands 4 mod with four selectable native reload behaviors.
+Skip reload delay with a single Borderlands 4 mod with four selectable native reload behaviors.
 
 ## Modes
 
