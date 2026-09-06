@@ -33,22 +33,28 @@
 
 ## Требования
 
-- Borderlands 4
-- BL-SDK / Oak2 Mod Manager
-- Mods Base **1.12+**
-- Keybinds **1.1+** для режимов Empty Fire Reload
+- Borderlands 4.
+- [BL4 PythonSDK / Oak2 Mod Manager v0.3+ — актуальный стабильный релиз](https://github.com/bl-sdk/oak2-mod-manager/releases/latest).
+- [Официальная инструкция по установке BL4 SDK](https://bl-sdk.github.io/oak2-mod-db/).
+
+Oak2 Mod Manager v0.3 уже включает необходимые **Mods Base 1.12**, **Console Mod Menu 1.6** и **Keybinds 1.1**. При использовании этого релиза или более новой совместимой версии Oak2 отдельно скачивать эти компоненты не нужно.
 
 ## Установка
 
-1. Полностью закройте Borderlands 4.
-2. Скопируйте `BL4_AutoReload.sdkmod` **не распаковывая** в:
-   `Borderlands 4\sdk_mods\`
-3. Запустите игру.
-4. Откройте PythonSDK / Mods.
-5. Включите **BL4 AutoReload**.
-6. Откройте настройки мода и выберите нужный **Behavior**.
+1. **Полностью закройте Borderlands 4.**
+2. Если BL4 PythonSDK / Oak2 ещё не установлен или его нужно обновить, скачайте [актуальный стабильный релиз Oak2 Mod Manager](https://github.com/bl-sdk/oak2-mod-manager/releases/latest). Распакуйте содержимое релиза SDK непосредственно в **корневую папку Borderlands 4** — ту, где находится папка `OakGame` — с объединением папок и файлов. Полная процедура, включая примечания для Proton/Linux, находится в [официальной инструкции BL4 SDK](https://bl-sdk.github.io/oak2-mod-db/).
+3. После установки/обновления SDK один раз запустите Borderlands 4. Дважды нажмите `~`, чтобы открыть SDK-консоль, введите `mods` и убедитесь, что открывается Mod Menu.
+4. Скачайте актуальный **BL4 AutoReload** из [GitHub Releases](https://github.com/Last1SiN/BL4-AutoReload/releases/latest) или с [Nexus Mods](https://www.nexusmods.com/borderlands4/mods/288).
+5. Снова полностью закройте игру и скопируйте `BL4_AutoReload.sdkmod` **не распаковывая** в:
 
-Старые отдельные `auto_reload_*` и `empty_fire_reload_*` одновременно с этим модом включать не нужно.
+   `Borderlands 4\sdk_mods\`
+
+6. Запустите/перезапустите Borderlands 4. Дважды нажмите `~`, введите `mods`, откройте **BL4 AutoReload** и включите мод.
+7. Откройте настройки мода и выберите нужный **Behavior**.
+
+Для обновления BL4 AutoReload замените существующий `BL4_AutoReload.sdkmod` более новой версией файла и перезапустите игру.
+
+Не включайте одновременно старые отдельные `auto_reload_*` или `empty_fire_reload_*` моды.
 
 ## Принцип работы
 
@@ -60,7 +66,6 @@
 
 В Empty Fire режимах спам кнопки огня во время уже начавшейся перезарядки не перезапускает reload.
 
-
 ## Совместимость и лицензия
 
 - Кооператив: **ClientSide** — проверено при установленном AutoReload только у локального игрока; остальные участники кооп-сессии играли без мода.
@@ -68,5 +73,6 @@
 
 ## Credits
 
-Creator: Sol (ChatGPT, GPT-5.6 Sol)
-QA: Last1SiN
+- **Создатель мода / код:** Sol (ChatGPT, GPT-5.6 Sol)
+- **QA / сопровождение:** [Last1SiN](https://github.com/Last1SiN)
+- **BL4 PythonSDK / Oak2 Mod Manager:** создан [apple1417](https://github.com/apple1417) при участии проекта и контрибьюторов [BL-SDK](https://github.com/bl-sdk).
