@@ -77,7 +77,7 @@ In Empty Fire modes, Fire spam while a reload is already running does not restar
 
 ## Compatibility and license
 
-- Co-op support: **ClientSide** — tested with the mod installed only on the local player while other co-op players did not have AutoReload installed.
+- Co-op support: **Unknown** — client-without-host-mod behavior has not yet been validated.
 - License: **GPL-3.0**
 
 ## Credits
