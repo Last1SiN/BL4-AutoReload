@@ -1,78 +1,75 @@
-# BL4 AutoReload v1.1.1
+# BL4 AutoReload
 
-Один мод с четырьмя переключаемыми режимами штатной перезарядки для Borderlands 4.
+[English](README.md) | [Русский](README_RU.md)
 
-## Режимы
+BL4 AutoReload добавляет в Borderlands 4 четыре переключаемых режима перезарядки, сохраняя штатную игровую логику reload и помогая убрать встроенную задержку перед началом перезарядки на нулевом боезапасе магазина.
 
-В настройках мода откройте **Behavior** и выберите один вариант:
+Мод не заменяет и не симулирует саму перезарядку, а просит игру запустить её обычным способом. Поэтому сохраняются штатные анимации, скорость перезарядки, бонусы и логика прерывания.
 
-- **Auto Reload - All Weapons** — сразу запускает штатную перезарядку при опустошении магазина любого поддерживаемого оружия.
-- **Auto Reload - Jakobs Only** — то же, но только для оружия Jakobs.
-- **Empty Fire Reload - All Weapons** — перезарядка запускается только при нажатии **Огонь**, когда магазин уже пуст.
-- **Empty Fire Reload - Jakobs Only** — то же, но только для оружия Jakobs.
+## Доступные режимы
 
-Выбранный режим сохраняется между запусками и может переключаться во время игры.
+### Auto Reload - All Weapons
 
-## Что изменилось в 1.1.1
+Автоматически запускает перезарядку, когда магазин поддерживаемого оружия становится пустым.
 
-Исправлена работа Auto Reload на оружии с отдельными запасами боеприпасов для primary и secondary fire.
+### Auto Reload - Jakobs Only
 
-У некоторых многорежимных пушек после полного расходования secondary fire и автоматического возврата на primary пустой AmmoPool альтернативного режима продолжает существовать на оружии. Теперь AutoReload учитывает активный `CurrentUseModeIndex` и выбирает AmmoPool именно текущего режима, вместо того чтобы брать первый найденный AmmoPool.
+То же поведение, но только для оружия Jakobs.
 
-Также игнорируется устаревшая репликация AmmoPool от уже неактивного fire mode.
+### Empty Fire Reload - All Weapons
 
-Это устраняет ошибочную перезарядку primary после каждого отдельного выстрела, если перед этим был полностью израсходован secondary/underbarrel режим.
+Не запускает перезарядку автоматически после последнего выстрела. Reload начинается только при следующем нажатии Fire, когда магазин уже пуст.
 
-## Action_Fire и переназначение кнопок
+### Empty Fire Reload - Jakobs Only
 
-В режимах **Empty Fire Reload** мод не хардкодит левую кнопку мыши.
+То же empty-fire поведение, но только для оружия Jakobs.
 
-Он читает текущие `Action_Fire` mappings из Enhanced Input и автоматически привязывается к актуальным клавишам/кнопкам, включая геймпад.
+## Возможности
 
-После изменения управления `Action_Fire` автоматически перечитывается через `OnControlMappingsRebuilt`; перезапуск игры и ручное переключение оружия не требуются. Дополнительно mappings обновляются при загрузке/экипировке и смене оружия.
+- Четыре переключаемых режима штатной перезарядки.
+- Режим выбирается в настройках мода и сохраняется между запусками.
+- Empty Fire режимы автоматически используют текущие `Action_Fire` bindings.
+- Поддерживаются keyboard/mouse и gamepad fire bindings.
+- Fire bindings обновляются после перестройки control mappings.
+- Для оружия с отдельными primary/secondary ammo pools используется активный `CurrentUseModeIndex`.
+- Устаревшие ammo replication events от неактивных fire modes игнорируются.
+- Используется штатный запрос reload игры вместо внешней симуляции перезарядки.
 
 ## Требования
 
-- Borderlands 4.
-- [BL4 PythonSDK / Oak2 Mod Manager v0.3+ — актуальный стабильный релиз](https://github.com/bl-sdk/oak2-mod-manager/releases/latest).
-- [Официальная инструкция по установке BL4 SDK](https://bl-sdk.github.io/oak2-mod-db/).
+- Borderlands 4
+- [BL4 PythonSDK / Oak2 Mod Manager](https://github.com/bl-sdk/oak2-mod-manager/releases/latest)
 
-Oak2 Mod Manager v0.3 уже включает необходимые **Mods Base 1.12**, **Console Mod Menu 1.6** и **Keybinds 1.1**. При использовании этого релиза или более новой совместимой версии Oak2 отдельно скачивать эти компоненты не нужно.
+Для установки и обновления SDK используйте [официальную инструкцию BL4 SDK / Oak2](https://bl-sdk.github.io/oak2-mod-db/).
 
-## Установка
+## Установка мода
 
-1. **Полностью закройте Borderlands 4.**
-2. Если BL4 PythonSDK / Oak2 ещё не установлен или его нужно обновить, скачайте [актуальный стабильный релиз Oak2 Mod Manager](https://github.com/bl-sdk/oak2-mod-manager/releases/latest). Распакуйте содержимое релиза SDK непосредственно в **корневую папку Borderlands 4** — ту, где находится папка `OakGame` — с объединением папок и файлов. Полная процедура, включая примечания для Proton/Linux, находится в [официальной инструкции BL4 SDK](https://bl-sdk.github.io/oak2-mod-db/).
-3. После установки/обновления SDK один раз запустите Borderlands 4. Дважды нажмите `~`, чтобы открыть SDK-консоль, введите `mods` и убедитесь, что открывается Mod Menu.
-4. Скачайте актуальный **BL4 AutoReload** из [GitHub Releases](https://github.com/Last1SiN/BL4-AutoReload/releases/latest) или с [Nexus Mods](https://www.nexusmods.com/borderlands4/mods/288).
-5. Снова полностью закройте игру и скопируйте `BL4_AutoReload.sdkmod` **не распаковывая** в:
+1. Установите или обновите BL4 PythonSDK / Oak2 по официальной инструкции выше.
+2. Скачайте `BL4_AutoReload.sdkmod` из [GitHub Releases](https://github.com/Last1SiN/BL4-AutoReload/releases/latest) или с [Nexus Mods](https://www.nexusmods.com/borderlands4/mods/288).
+3. При полностью закрытой Borderlands 4 скопируйте `.sdkmod` целиком в `Borderlands 4\sdk_mods\`. Сам `.sdkmod` распаковывать не нужно.
+4. Запустите игру, откройте Mods menu, включите **BL4 AutoReload** и выберите нужный **Behavior**.
 
-   `Borderlands 4\sdk_mods\`
-
-6. Запустите/перезапустите Borderlands 4. Дважды нажмите `~`, введите `mods`, откройте **BL4 AutoReload** и включите мод.
-7. Откройте настройки мода и выберите нужный **Behavior**.
-
-Для обновления BL4 AutoReload замените существующий `BL4_AutoReload.sdkmod` более новой версией файла и перезапустите игру.
+Для обновления замените существующий `.sdkmod` новым файлом и перезапустите игру.
 
 Не включайте одновременно старые отдельные `auto_reload_*` или `empty_fire_reload_*` моды.
 
 ## Принцип работы
 
-Мод использует штатный игровой вызов:
+Мод использует штатный игровой запрос reload:
 
 `ServerStartReloading(CurrentUseModeIndex, 0)`
 
 Поэтому сохраняются обычная анимация перезарядки, скорость reload, влияние перков и стандартная логика прерывания.
 
-В Empty Fire режимах спам кнопки огня во время уже начавшейся перезарядки не перезапускает reload.
-
 ## Совместимость и лицензия
 
-- Кооператив: **Unknown** — сценарий, где мод установлен у клиента, но отсутствует у хоста, пока не проверен.
+- Кооператив: **Unknown** — сценарий, где мод установлен только у клиента, а у хоста его нет, пока не проверен.
+- Мод не заменяет weapon animations и не изменяет значения reload speed.
 - Лицензия: **GPL-3.0**
 
 ## Credits
 
-- **Development:** Sol / GPT-5.6 Sol
-- **Design, testing & QA:** Last1SiN
-- **BL4 PythonSDK / Oak2 Mod Manager:** создан [apple1417](https://github.com/apple1417) при участии проекта и контрибьюторов [BL-SDK](https://github.com/bl-sdk).
+**Development:** Sol / GPT-5.6 Sol  
+**Design, testing & QA:** Last1SiN
+
+**BL4 PythonSDK / Oak2 Mod Manager:** создан [apple1417](https://github.com/apple1417) при участии проекта и контрибьюторов [BL-SDK](https://github.com/bl-sdk).
