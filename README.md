@@ -65,7 +65,7 @@ Normal reload animation, reload speed, perk effects and standard interruption be
 
 - Co-op support: **Unknown** — behavior with the mod installed only on a client while the host does not have it has not yet been validated.
 - The mod does not replace weapon animations or modify reload speed values.
-- License: **GPL-3.0**
+- License: **GNU GPLv3 with [Section 7 additional provenance terms](ADDITIONAL_TERMS.md)**
 
 ## Credits
 
