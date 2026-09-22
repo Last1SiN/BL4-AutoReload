@@ -28,8 +28,6 @@ JAKOBS_MODES = (MODE_AUTO_JAKOBS, MODE_EMPTY_JAKOBS)
 LOG_PATH = MODS_DIR / "BL4_AutoReload.log"
 
 _pending: set[int] = set()
-_last_loaded: dict[int, int] = {}
-_jakobs_cache: dict[int, bool] = {}
 
 _mapping_rebuild_hook: HookType | None = None
 _mapping_rebuild_path: str | None = None
@@ -69,10 +67,7 @@ def _char():
 
 
 def _weapon():
-    """
-    Original auto-reload selector: first active weapon slot with a weapon.
-    Preserved from the user-tested v1.3 auto variants.
-    """
+    """Return the first weapon in the character's active weapon slots."""
     c = _char()
     if c is None:
         return None
@@ -86,9 +81,7 @@ def _weapon():
 
 
 def _active_weapon():
-    """
-    Selector used by the user-tested Empty Fire v1.5 path.
-    """
+    """Return the active weapon, falling back to the first populated slot."""
     c = _char()
     if c is None:
         return None
@@ -257,59 +250,25 @@ def _state(w) -> str:
         return ""
 
 
-def _looks_jakobs(value: Any) -> bool:
-    try:
-        text = repr(value).lower()
-    except Exception:
-        return False
-    return "jakobs" in text or "jak_" in text
-
-
 def _is_jakobs(w) -> bool:
+    """Identify Jakobs from the weapon's native ManufacturerMod enum."""
     if w is None:
         return False
 
-    key = _addr(w)
-    cached = _jakobs_cache.get(key)
-    if cached is not None:
-        return cached
+    try:
+        manufacturer_mod = w.ManufacturerMod
+    except Exception:
+        return False
 
-    for collection_name in ("InstanceComponents", "BlueprintCreatedComponents"):
+    try:
+        name = manufacturer_mod.name
+    except Exception:
         try:
-            components = list(getattr(w, collection_name))
+            name = str(manufacturer_mod).rsplit(".", 1)[-1]
         except Exception:
-            continue
+            return False
 
-        for component in components:
-            if _looks_jakobs(component):
-                _jakobs_cache[key] = True
-                return True
-
-            for attr_name in (
-                "AnimClass",
-                "AnimScriptInstance",
-                "SkeletalMesh",
-                "SkeletalMeshAsset",
-                "Class",
-                "Name",
-            ):
-                try:
-                    if _looks_jakobs(getattr(component, attr_name)):
-                        _jakobs_cache[key] = True
-                        return True
-                except Exception:
-                    pass
-
-    for attr_name in ("ManufacturerMod", "TrickData", "BodyData", "Item"):
-        try:
-            if _looks_jakobs(getattr(w, attr_name)):
-                _jakobs_cache[key] = True
-                return True
-        except Exception:
-            pass
-
-    _jakobs_cache[key] = False
-    return False
+    return str(name).casefold().startswith("jakobs")
 
 
 def _mode() -> str:
@@ -333,23 +292,11 @@ def _mode_allows_weapon(w) -> bool:
 
 
 def _is_weapon_fire_feedback(args: Any) -> bool:
+    """Match the native BL4 weapon-fire feedback GameData handle."""
     try:
-        text = repr(args.data).lower()
+        return str(args.data._name).startswith("FBData_WeaponFire_")
     except Exception:
-        try:
-            text = repr(args).lower()
-        except Exception:
-            return False
-    return "weaponfire" in text or ("weapon" in text and "fire" in text)
-
-
-def _seed_current_weapon() -> None:
-    w = _weapon()
-    if w is None:
-        return
-    value = _loaded(w)
-    if value is not None:
-        _last_loaded[_addr(w)] = value
+        return False
 
 
 def _request_reload(w, source: str) -> bool:
@@ -363,8 +310,6 @@ def _request_reload(w, source: str) -> bool:
 
     current = _loaded(w)
     if current is None or current > 0:
-        if current is not None:
-            _last_loaded[_addr(w)] = current
         _pending.discard(_addr(w))
         return False
 
@@ -407,7 +352,6 @@ def _request_reload(w, source: str) -> bool:
 
 def _on_behavior_change(option, new_value: str) -> None:
     _pending.clear()
-    _last_loaded.clear()
 
     if new_value in EMPTY_MODES:
         _refresh_fire_keys("Behavior change")
@@ -434,7 +378,7 @@ behavior = DropdownOption(
 
 
 # --------------------------------------------------------------------------------------
-# Auto Reload path — preserved from the user-tested v1.3 variants
+# Auto Reload path
 # --------------------------------------------------------------------------------------
 
 @hook(
@@ -455,8 +399,6 @@ def _weapon_fire_feedback(obj, args, ret, func):
     current = _loaded(w)
     if current is None:
         return
-
-    _last_loaded[_addr(w)] = current
 
     if current == 0:
         _request_reload(w, "WeaponFire feedback")
@@ -522,14 +464,13 @@ def _jakobs_shotgun_fast_path(obj, args, ret, func):
 
     value = _loaded(w)
     if value is not None:
-        _last_loaded[_addr(w)] = value
 
     if value == 0:
         _request_reload(w, "proven Jakobs shotgun PRE")
 
 
 # --------------------------------------------------------------------------------------
-# Empty Fire path — preserved from the user-tested v1.5 variants
+# Empty Fire path
 # --------------------------------------------------------------------------------------
 
 def _request_reload_from_fire_press() -> None:
@@ -812,11 +753,7 @@ def _reload_ended(obj, args, ret, func):
     except Exception:
         return
 
-    key = _addr(w)
-    _pending.discard(key)
-    value = _loaded(w)
-    if value is not None:
-        _last_loaded[key] = value
+    _pending.discard(_addr(w))
 
 
 @hook(
@@ -824,7 +761,6 @@ def _reload_ended(obj, args, ret, func):
     Type.POST,
 )
 def _weapon_changed(obj, args, ret, func):
-    _seed_current_weapon()
     _refresh_fire_keys("OnWeaponChanged")
     _ensure_mapping_rebuild_hook()
 
@@ -837,15 +773,12 @@ def _inventory_equipped(obj, args, ret, func):
     c = _char()
     if c is None or obj != c:
         return
-
-    _seed_current_weapon()
     _refresh_fire_keys("OnInventoryEquippedOnSlot")
     _ensure_mapping_rebuild_hook()
 
 
 def on_enable() -> None:
     _pending.clear()
-    _seed_current_weapon()
     _refresh_fire_keys("on_enable")
     _ensure_mapping_rebuild_hook()
     _log(f"enabled; Behavior={_mode()}")
@@ -869,7 +802,7 @@ def on_disable() -> None:
 
 try:
     LOG_PATH.write_text(
-        "BL4 AutoReload v1.1.2\n"
+        "BL4 AutoReload v1.1.3\n"
         "Development: Sol / GPT-5.6 Sol\n"
         "Design, testing & QA: Last1SiN\n",
         encoding="utf-8",
