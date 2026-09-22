@@ -462,10 +462,7 @@ def _jakobs_shotgun_fast_path(obj, args, ret, func):
     if w is None:
         return
 
-    value = _loaded(w)
-    if value is not None:
-
-    if value == 0:
+    if _loaded(w) == 0:
         _request_reload(w, "proven Jakobs shotgun PRE")
 
 
