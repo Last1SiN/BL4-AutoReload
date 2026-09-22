@@ -288,7 +288,7 @@ def _is_weapon_fire_feedback(args: Any) -> bool:
         return False
 
 
-def _request_reload(w, source: str) -> bool:
+def _request_reload(w) -> bool:
     if (
         w is None
         or not _mode_allows_weapon(w)
@@ -384,7 +384,7 @@ def _weapon_fire_feedback(obj, args, ret, func):
         return
 
     if current == 0:
-        _request_reload(w, "WeaponFire feedback")
+        _request_reload(w)
 
 
 @hook(
@@ -414,7 +414,7 @@ def _ammo_rep_fallback(obj, args, ret, func):
     ):
         return
 
-    _request_reload(w, "AmmoPool replication fallback")
+    _request_reload(w)
 
 
 @hook(
@@ -442,7 +442,7 @@ def _jakobs_shotgun_fast_path(obj, args, ret, func):
         return
 
     if _loaded(w) == 0:
-        _request_reload(w, "proven Jakobs shotgun PRE")
+        _request_reload(w)
 
 
 # --------------------------------------------------------------------------------------
@@ -475,7 +475,7 @@ def _request_reload_from_fire_press() -> None:
     if loaded is None or loaded != 0:
         return
 
-    _request_reload(w, "empty Action_Fire press")
+    _request_reload(w)
 
 
 @keybind(
@@ -624,8 +624,6 @@ def _refresh_fire_keys() -> None:
 
         # Oak2 Keybinds automatically re-registers an enabled keybind when .key changes.
         slot.key = new_key
-
-    if changed:
 
 
 def _bound_function_path(bound_function: Any) -> str | None:
