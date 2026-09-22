@@ -1,6 +1,6 @@
 [project]
 name = "BL4-AutoReload"
-version = "1.1.1"
+version = "1.1.2"
 description = "Borderlands 4 native reload behavior mod with four selectable modes."
 authors = [
     { name = "Sol / GPT-5.6 Sol" }
@@ -15,7 +15,7 @@ AdditionalTerms = "https://github.com/Last1SiN/BL4-AutoReload/blob/main/ADDITION
 
 [tool.sdkmod]
 name = "BL4 AutoReload"
-version = "1.1.1"
+version = "1.1.2"
 license = { name = "GPL3 + Section 7 terms", url = "https://github.com/Last1SiN/BL4-AutoReload/blob/main/ADDITIONAL_TERMS.md" }
 download = "https://github.com/Last1SiN/BL4-AutoReload/releases/latest/download/BL4_AutoReload.sdkmod"
 coop_support = "Unknown"

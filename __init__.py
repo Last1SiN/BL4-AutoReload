@@ -14,7 +14,7 @@ from mods_base import (
 )
 from unrealsdk.hooks import Type
 
-__author__ = "Sol (ChatGPT, GPT-5.6 Sol)"
+__author__ = "Sol / GPT-5.6 Sol"
 
 MODE_AUTO_ALL = "Auto Reload - All Weapons"
 MODE_AUTO_JAKOBS = "Auto Reload - Jakobs Only"
@@ -37,7 +37,6 @@ _mapping_rebuild_path: str | None = None
 
 def _log(msg: str) -> None:
     line = f"[BL4 AutoReload] {msg}"
-    print(line)
     try:
         with LOG_PATH.open("a", encoding="utf-8", errors="replace") as f:
             f.write(line + "\n")
@@ -215,7 +214,40 @@ def _has_magazine(w) -> bool:
             value = int(value)
         return value > 0
     except Exception:
-        return True
+        return False
+
+
+def _has_native_reload_behavior(w) -> bool:
+    """Return True only when the weapon exposes a native reload behavior.
+
+    Some non-reloadable weapon types, including Ordnance/HeavyWeaponGadget,
+    expose an AmmoPool and ServerStartReloading() even though their ammunition
+    is governed by a cooldown/recharge path. Calling the reload RPC on those
+    weapons can refill the pool immediately, bypassing the intended cooldown.
+    """
+    if w is None:
+        return False
+
+    try:
+        behaviors = list(w.behaviors)
+    except Exception:
+        return False
+
+    for behavior_obj in behaviors:
+        try:
+            class_name = str(behavior_obj.Class.Name)
+        except Exception:
+            class_name = ""
+
+        try:
+            name = str(behavior_obj.Name)
+        except Exception:
+            name = ""
+
+        if "reload" in f"{class_name} {name}".lower():
+            return True
+
+    return False
 
 
 def _state(w) -> str:
@@ -321,7 +353,12 @@ def _seed_current_weapon() -> None:
 
 
 def _request_reload(w, source: str) -> bool:
-    if w is None or not _mode_allows_weapon(w) or not _has_magazine(w):
+    if (
+        w is None
+        or not _mode_allows_weapon(w)
+        or not _has_magazine(w)
+        or not _has_native_reload_behavior(w)
+    ):
         return False
 
     current = _loaded(w)
@@ -777,7 +814,6 @@ def _reload_ended(obj, args, ret, func):
 
     key = _addr(w)
     _pending.discard(key)
-
     value = _loaded(w)
     if value is not None:
         _last_loaded[key] = value
@@ -833,9 +869,9 @@ def on_disable() -> None:
 
 try:
     LOG_PATH.write_text(
-        "BL4 AutoReload v1.1.1\n"
-        "Creator: Sol (ChatGPT, GPT-5.6 Sol)\n"
-        "QA: Last1SiN\n",
+        "BL4 AutoReload v1.1.2\n"
+        "Development: Sol / GPT-5.6 Sol\n"
+        "Design, testing & QA: Last1SiN\n",
         encoding="utf-8",
     )
 except Exception:
