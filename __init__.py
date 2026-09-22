@@ -6,7 +6,6 @@ from mods_base import (
     DropdownOption,
     EInputEvent,
     HookType,
-    MODS_DIR,
     build_mod,
     get_pc,
     hook,
@@ -25,21 +24,11 @@ AUTO_MODES = (MODE_AUTO_ALL, MODE_AUTO_JAKOBS)
 EMPTY_MODES = (MODE_EMPTY_ALL, MODE_EMPTY_JAKOBS)
 JAKOBS_MODES = (MODE_AUTO_JAKOBS, MODE_EMPTY_JAKOBS)
 
-LOG_PATH = MODS_DIR / "BL4_AutoReload.log"
 
 _pending: set[int] = set()
 
 _mapping_rebuild_hook: HookType | None = None
 _mapping_rebuild_path: str | None = None
-
-
-def _log(msg: str) -> None:
-    line = f"[BL4 AutoReload] {msg}"
-    try:
-        with LOG_PATH.open("a", encoding="utf-8", errors="replace") as f:
-            f.write(line + "\n")
-    except Exception:
-        pass
 
 
 def _addr(obj: Any) -> int:
@@ -299,7 +288,7 @@ def _is_weapon_fire_feedback(args: Any) -> bool:
         return False
 
 
-def _request_reload(w, source: str) -> bool:
+def _request_reload(w) -> bool:
     if (
         w is None
         or not _mode_allows_weapon(w)
@@ -331,18 +320,14 @@ def _request_reload(w, source: str) -> bool:
     _pending.add(key)
     try:
         w.ServerStartReloading(use_mode, 0)
-    except Exception as exc:
+    except Exception:
         _pending.discard(key)
-        _log(f"reload ERROR from {source}: {exc!r}")
         return False
 
     after = _state(w)
     if after != "Reloading":
         _pending.discard(key)
-        _log(f"reload rejected from {source}; state={after!r}")
         return False
-
-    _log(f"reload START [{_mode()}] from {source}; weapon={w!r}")
     return True
 
 
@@ -354,10 +339,8 @@ def _on_behavior_change(option, new_value: str) -> None:
     _pending.clear()
 
     if new_value in EMPTY_MODES:
-        _refresh_fire_keys("Behavior change")
+        _refresh_fire_keys()
         _ensure_mapping_rebuild_hook()
-
-    _log(f"Behavior changed -> {new_value}")
 
 
 behavior = DropdownOption(
@@ -401,7 +384,7 @@ def _weapon_fire_feedback(obj, args, ret, func):
         return
 
     if current == 0:
-        _request_reload(w, "WeaponFire feedback")
+        _request_reload(w)
 
 
 @hook(
@@ -429,13 +412,9 @@ def _ammo_rep_fallback(obj, args, ret, func):
         and pool_use_mode is not None
         and pool_use_mode != current_use_mode
     ):
-        _log(
-            "ignored stale AmmoPool replication; "
-            f"pool_mode={pool_use_mode} current_mode={current_use_mode}"
-        )
         return
 
-    _request_reload(w, "AmmoPool replication fallback")
+    _request_reload(w)
 
 
 @hook(
@@ -463,7 +442,7 @@ def _jakobs_shotgun_fast_path(obj, args, ret, func):
         return
 
     if _loaded(w) == 0:
-        _request_reload(w, "proven Jakobs shotgun PRE")
+        _request_reload(w)
 
 
 # --------------------------------------------------------------------------------------
@@ -496,7 +475,7 @@ def _request_reload_from_fire_press() -> None:
     if loaded is None or loaded != 0:
         return
 
-    _request_reload(w, "empty Action_Fire press")
+    _request_reload(w)
 
 
 @keybind(
@@ -626,14 +605,12 @@ def _discover_fire_keys() -> list[str]:
     return result
 
 
-def _refresh_fire_keys(source: str) -> None:
+def _refresh_fire_keys() -> None:
     keys = _discover_fire_keys()
     if not keys:
         return
 
     keys = keys[: len(_FIRE_SLOTS)]
-    changed = False
-
     for i, slot in enumerate(_FIRE_SLOTS):
         new_key = keys[i] if i < len(keys) else None
 
@@ -647,10 +624,6 @@ def _refresh_fire_keys(source: str) -> None:
 
         # Oak2 Keybinds automatically re-registers an enabled keybind when .key changes.
         slot.key = new_key
-        changed = True
-
-    if changed:
-        _log(f"Action_Fire bindings refreshed from {source}: {keys!r}")
 
 
 def _bound_function_path(bound_function: Any) -> str | None:
@@ -689,7 +662,7 @@ def _control_mappings_rebuilt(obj, args, ret, func):
     except Exception:
         return
 
-    _refresh_fire_keys("OnControlMappingsRebuilt")
+    _refresh_fire_keys()
 
 
 def _ensure_mapping_rebuild_hook() -> None:
@@ -727,13 +700,11 @@ def _ensure_mapping_rebuild_hook() -> None:
             hook_identifier="BL4_AutoReload:OnControlMappingsRebuilt",
         )(_control_mappings_rebuilt)
         dynamic_hook.enable()
-    except Exception as exc:
-        _log(f"Unable to hook OnControlMappingsRebuilt ({path!r}): {exc!r}")
+    except Exception:
         return
 
     _mapping_rebuild_hook = dynamic_hook
     _mapping_rebuild_path = path
-    _log(f"Auto Action_Fire refresh hook enabled: {path}")
 
 
 # --------------------------------------------------------------------------------------
@@ -758,7 +729,7 @@ def _reload_ended(obj, args, ret, func):
     Type.POST,
 )
 def _weapon_changed(obj, args, ret, func):
-    _refresh_fire_keys("OnWeaponChanged")
+    _refresh_fire_keys()
     _ensure_mapping_rebuild_hook()
 
 
@@ -770,15 +741,14 @@ def _inventory_equipped(obj, args, ret, func):
     c = _char()
     if c is None or obj != c:
         return
-    _refresh_fire_keys("OnInventoryEquippedOnSlot")
+    _refresh_fire_keys()
     _ensure_mapping_rebuild_hook()
 
 
 def on_enable() -> None:
     _pending.clear()
-    _refresh_fire_keys("on_enable")
+    _refresh_fire_keys()
     _ensure_mapping_rebuild_hook()
-    _log(f"enabled; Behavior={_mode()}")
 
 
 def on_disable() -> None:
@@ -794,20 +764,7 @@ def on_disable() -> None:
 
     _mapping_rebuild_hook = None
     _mapping_rebuild_path = None
-    _log("disabled")
 
-
-try:
-    LOG_PATH.write_text(
-        "BL4 AutoReload v1.1.3\n"
-        "Development: Sol / GPT-5.6 Sol\n"
-        "Design, testing & QA: Last1SiN\n",
-        encoding="utf-8",
-    )
-except Exception:
-    pass
-
-_log("loaded")
 
 build_mod(
     on_enable=on_enable,
