@@ -423,7 +423,7 @@ def _ammo_rep_fallback(obj, args, ret, func):
     Type.PRE,
 )
 def _jakobs_shotgun_fast_path(obj, args, ret, func):
-    # Preserve the exact proven fast path only for the Jakobs-only auto mode.
+    # Jakobs shotgun-specific PRE path for the Jakobs-only auto mode.
     if _mode() != MODE_AUTO_JAKOBS:
         return
 
