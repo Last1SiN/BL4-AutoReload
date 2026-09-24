@@ -2,9 +2,11 @@
 
 [English](README.md) | [Русский](README_RU.md)
 
-BL4 AutoReload adds four selectable reload behaviors to Borderlands 4 while keeping the game's native reload logic, helping eliminate the built-in delay before a reload starts on zero ammo.
+BL4 AutoReload gets rid of the awkward pause when a magazine runs dry.
 
-Instead of replacing or simulating the reload itself, the mod asks the game to start its normal reload. This preserves normal reload animations, reload speed, bonuses and interruption behavior.
+You can have the game reload automatically, or make it wait until you press Fire again on an empty magazine. Both behaviors can be used with every supported weapon or limited to Jakobs only.
+
+The mod still uses Borderlands 4's normal reload, so animations, reload speed, perks and interruption behavior work the way they normally do.
 
 ## Available modes
 
@@ -26,14 +28,13 @@ The same empty-fire behavior, limited to Jakobs weapons.
 
 ## Features
 
-- Four selectable native reload behaviors.
-- Behavior can be changed from the in-game mod settings and is saved between sessions.
-- Empty Fire modes automatically follow the current `Action_Fire` bindings.
-- Supports keyboard/mouse and gamepad fire bindings.
-- Refreshes fire bindings after control mappings are rebuilt.
-- Handles weapons with separate primary and secondary fire ammo pools by following the active `CurrentUseModeIndex`.
-- Ignores stale ammo replication events from inactive fire modes.
-- Uses the game's native reload request instead of externally simulating a reload.
+- Automatic reload when the magazine reaches zero.
+- Optional "press Fire again to reload" behavior for empty magazines.
+- Both modes can apply to all supported weapons or Jakobs only.
+- Works with keyboard/mouse and gamepad.
+- Follows your current Fire binding, including after remapping controls.
+- Handles weapons with separate primary and secondary ammo pools.
+- Uses the game's normal reload instead of faking one.
 
 ## Requirements
 
