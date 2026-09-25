@@ -52,8 +52,6 @@ Use the [official BL4 SDK / Oak2 installation guide](https://bl-sdk.github.io/oa
 
 To update BL4 AutoReload, replace the existing `.sdkmod` with the newer file and restart the game.
 
-Do not enable older standalone `auto_reload_*` or `empty_fire_reload_*` mods at the same time as BL4 AutoReload.
-
 ## How it works
 
 The mod uses the game's native reload request:
